@@ -1,0 +1,22 @@
+{
+	"name": "sourceJsonOrderDetailsBlob",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "linkedService_Storage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@concat(pipeline().RunId,'json')",
+					"type": "Expression"
+				},
+				"folderPath": "Orders",
+				"container": "moviedDb"
+			}
+		}
+	}
+}
