@@ -1,9 +1,9 @@
 {
-	"name": "pipeline1",
+	"name": "pipe_OrdersFlow",
 	"properties": {
 		"activities": [
 			{
-				"name": "pipe_sqlToCosmosFlow",
+				"name": "sqlToCosmosOrdersFlow",
 				"type": "ExecuteDataFlow",
 				"dependsOn": [],
 				"policy": {
