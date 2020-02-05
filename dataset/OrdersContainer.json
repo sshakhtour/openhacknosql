@@ -1,0 +1,14 @@
+{
+	"name": "OrdersContainer",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "linkedservice_CosmosMoviesDB",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "CosmosDbSqlApiCollection",
+		"typeProperties": {
+			"collectionName": "Orders"
+		}
+	}
+}
