@@ -1,5 +1,5 @@
 {
-	"name": "blobOrderDetails",
+	"name": "sinkBlobOrderDetails",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "linkedService_Storage",
