@@ -1,0 +1,499 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "adfcontosovideo"
+		},
+		"linkedservice_CosmosMoviesDB_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'linkedservice_CosmosMoviesDB'"
+		},
+		"linkedservice_MoviesDB_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'linkedservice_MoviesDB'"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/CopyMoviesDB')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ForEach_dul",
+						"type": "ForEach",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@pipeline().parameters.cw_items",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Copy_dul",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [
+										{
+											"name": "Source",
+											"value": "dbo.@{item().source.table}"
+										},
+										{
+											"name": "Destination",
+											"value": "@{item().destination.collectionName}"
+										}
+									],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource"
+										},
+										"sink": {
+											"type": "CosmosDbSqlApiSink",
+											"writeBehavior": {
+												"value": "@item().copySink.writeBehavior",
+												"type": "Expression"
+											},
+											"disableMetricsCollection": false
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "SourceDataset_dul",
+											"type": "DatasetReference",
+											"parameters": {
+												"cw_table": "@item().source.table"
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "DestinationDataset_dul",
+											"type": "DatasetReference",
+											"parameters": {
+												"cw_collectionName": "@item().destination.collectionName"
+											}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"parameters": {
+					"cw_items": {
+						"type": "Array",
+						"defaultValue": [
+							{
+								"source": {
+									"table": "Cartitem"
+								},
+								"destination": {
+									"collectionName": "CartItem"
+								},
+								"copySink": {
+									"writeBehavior": "upsert"
+								}
+							},
+							{
+								"source": {
+									"table": "Category"
+								},
+								"destination": {
+									"collectionName": "Category"
+								},
+								"copySink": {
+									"writeBehavior": "insert"
+								}
+							},
+							{
+								"source": {
+									"table": "Event"
+								},
+								"destination": {
+									"collectionName": "Event"
+								},
+								"copySink": {
+									"writeBehavior": "insert"
+								}
+							},
+							{
+								"source": {
+									"table": "Item"
+								},
+								"destination": {
+									"collectionName": "Item"
+								},
+								"copySink": {
+									"writeBehavior": "insert"
+								}
+							},
+							{
+								"source": {
+									"table": "ItemAggregate"
+								},
+								"destination": {
+									"collectionName": "ItemAggregate"
+								},
+								"copySink": {
+									"writeBehavior": "insert"
+								}
+							},
+							{
+								"source": {
+									"table": "OrderDetails"
+								},
+								"destination": {
+									"collectionName": "OrderDetail"
+								},
+								"copySink": {
+									"writeBehavior": "insert"
+								}
+							},
+							{
+								"source": {
+									"table": "Orders"
+								},
+								"destination": {
+									"collectionName": "Orders"
+								},
+								"copySink": {
+									"writeBehavior": "insert"
+								}
+							},
+							{
+								"source": {
+									"table": "User"
+								},
+								"destination": {
+									"collectionName": "User"
+								},
+								"copySink": {
+									"writeBehavior": "insert"
+								}
+							}
+						]
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/SourceDataset_dul')]",
+				"[concat(variables('factoryId'), '/datasets/DestinationDataset_dul')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DestinationDataset_dul')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "linkedservice_CosmosMoviesDB",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"cw_collectionName": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "CosmosDbSqlApiCollection",
+				"schema": {},
+				"typeProperties": {
+					"collectionName": {
+						"value": "@dataset().cw_collectionName",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/linkedservice_CosmosMoviesDB')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SourceDataset_dul')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "linkedservice_MoviesDB",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"cw_table": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": {
+						"value": "@dataset().cw_table",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/linkedservice_MoviesDB')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/linkedservice_CosmosMoviesDB')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "CosmosDb",
+				"typeProperties": {
+					"connectionString": "[parameters('linkedservice_CosmosMoviesDB_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/linkedservice_MoviesDB')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('linkedservice_MoviesDB_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/sqlToCosmosFlow')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "OrdersTable",
+								"type": "DatasetReference"
+							},
+							"name": "sqlDBOrders",
+							"typeProperties": {}
+						},
+						{
+							"dataset": {
+								"referenceName": "OrderDetailsTable",
+								"type": "DatasetReference"
+							},
+							"name": "sqlDBOrderDetails",
+							"typeProperties": {}
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "OrdersContainer",
+								"type": "DatasetReference"
+							},
+							"name": "sinkCosmosOrders"
+						}
+					],
+					"transformations": [
+						{
+							"name": "joinOrderOrderDetails"
+						}
+					],
+					"script": "source(output(\n\t\tOrderId as integer,\n\t\tOrderDate as timestamp,\n\t\tFirstName as string,\n\t\tLastName as string,\n\t\tAddress as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tPostalCode as string,\n\t\tCountry as string,\n\t\tPhone as string,\n\t\tSMSOptIn as boolean,\n\t\tSMSStatus as string,\n\t\tEmail as string,\n\t\tReceiptUrl as string,\n\t\tTotal as decimal(18,2),\n\t\tPaymentTransactionId as string,\n\t\tHasBeenShipped as boolean\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> sqlDBOrders\nsource(output(\n\t\tOrderDetailId as integer,\n\t\tOrderId as integer,\n\t\tEmail as string,\n\t\tProductId as integer,\n\t\tQuantity as integer,\n\t\tUnitPrice as decimal(18,2)\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> sqlDBOrderDetails\nsqlDBOrders, sqlDBOrderDetails join(sqlDBOrders@OrderId == sqlDBOrderDetails@OrderId,\n\tjoinType:'inner',\n\tbroadcast: 'none')~> joinOrderOrderDetails\njoinOrderOrderDetails sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'document',\n\tpartitionKey: ['/OrderId'],\n\tmapColumn(\n\t\tOrderId = sqlDBOrders@OrderId,\n\t\tOrderDate,\n\t\tFirstName,\n\t\tLastName,\n\t\tAddress,\n\t\tCity,\n\t\tState,\n\t\tPostalCode,\n\t\tCountry,\n\t\tPhone,\n\t\tSMSOptIn,\n\t\tSMSStatus,\n\t\tEmail = sqlDBOrders@Email,\n\t\tReceiptUrl,\n\t\tTotal,\n\t\tPaymentTransactionId,\n\t\tHasBeenShipped,\n\t\tOrderDetailId,\n\t\tProductId,\n\t\tQuantity,\n\t\tUnitPrice\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sinkCosmosOrders"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/OrdersTable')]",
+				"[concat(variables('factoryId'), '/datasets/OrderDetailsTable')]",
+				"[concat(variables('factoryId'), '/datasets/OrdersContainer')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/OrdersTable')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "linkedservice_MoviesDB",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "OrderId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "OrderDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "FirstName",
+						"type": "varchar"
+					},
+					{
+						"name": "LastName",
+						"type": "varchar"
+					},
+					{
+						"name": "Address",
+						"type": "varchar"
+					},
+					{
+						"name": "City",
+						"type": "varchar"
+					},
+					{
+						"name": "State",
+						"type": "varchar"
+					},
+					{
+						"name": "PostalCode",
+						"type": "varchar"
+					},
+					{
+						"name": "Country",
+						"type": "varchar"
+					},
+					{
+						"name": "Phone",
+						"type": "varchar"
+					},
+					{
+						"name": "SMSOptIn",
+						"type": "bit"
+					},
+					{
+						"name": "SMSStatus",
+						"type": "varchar"
+					},
+					{
+						"name": "Email",
+						"type": "varchar"
+					},
+					{
+						"name": "ReceiptUrl",
+						"type": "varchar"
+					},
+					{
+						"name": "Total",
+						"type": "decimal",
+						"precision": 18,
+						"scale": 2
+					},
+					{
+						"name": "PaymentTransactionId",
+						"type": "varchar"
+					},
+					{
+						"name": "HasBeenShipped",
+						"type": "bit"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "Orders"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/linkedservice_MoviesDB')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/OrderDetailsTable')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "linkedservice_MoviesDB",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "OrderDetailId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "OrderId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Email",
+						"type": "varchar"
+					},
+					{
+						"name": "ProductId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Quantity",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "UnitPrice",
+						"type": "decimal",
+						"precision": 18,
+						"scale": 2
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "OrderDetails"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/linkedservice_MoviesDB')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/OrdersContainer')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "linkedservice_CosmosMoviesDB",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "CosmosDbSqlApiCollection",
+				"schema": {},
+				"typeProperties": {
+					"collectionName": "Orders"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/linkedservice_CosmosMoviesDB')]"
+			]
+		}
+	]
+}
