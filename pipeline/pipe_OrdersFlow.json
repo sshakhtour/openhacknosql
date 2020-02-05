@@ -3,46 +3,9 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "deleteOrderDetailsBlobs",
-				"type": "Delete",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "7.00:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"dataset": {
-						"referenceName": "sinkBlobOrderDetails",
-						"type": "DatasetReference"
-					},
-					"logStorageSettings": {
-						"linkedServiceName": {
-							"referenceName": "linkedService_Storage",
-							"type": "LinkedServiceReference"
-						}
-					},
-					"enableLogging": true,
-					"storeSettings": {
-						"type": "AzureBlobStorageReadSettings",
-						"recursive": true
-					}
-				}
-			},
-			{
 				"name": "copyOrderDetailsSQLtoBlob",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "deleteOrderDetailsBlobs",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "7.00:00:00",
 					"retry": 0,
@@ -128,6 +91,30 @@
 						"type": "DatasetReference"
 					}
 				]
+			},
+			{
+				"name": "deleteOldBlobs",
+				"type": "Delete",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "sourceBlobsToDelete",
+						"type": "DatasetReference"
+					},
+					"enableLogging": false,
+					"storeSettings": {
+						"type": "AzureBlobStorageReadSettings",
+						"recursive": true
+					}
+				}
 			}
 		],
 		"annotations": []

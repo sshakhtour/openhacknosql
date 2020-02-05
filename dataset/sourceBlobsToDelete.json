@@ -1,0 +1,18 @@
+{
+	"name": "sourceBlobsToDelete",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "linkedService_Storage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"folderPath": "Orders",
+				"container": "moviesdb"
+			}
+		}
+	}
+}
