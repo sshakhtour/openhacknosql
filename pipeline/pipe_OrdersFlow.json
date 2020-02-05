@@ -3,8 +3,8 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "sqlToCosmosOrdersFlow",
-				"type": "ExecuteDataFlow",
+				"name": "copyOrderDetails",
+				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "7.00:00:00",
@@ -15,15 +15,155 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"dataflow": {
-						"referenceName": "sqlToCosmosFlow",
-						"type": "DataFlowReference"
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT [value] FROM OPENJSON(\n(Select \n    o.OrderId, \n    o.OrderDate, \n    o.FirstName, \n    o.LastName, \n    o.[Address], \n    o.City, \n    o.[State], \n    o.PostalCode, \n    o.Country, \n    o.Phone, \n    o.SMSOptIn, \n    o.SMSStatus, \n    o.Email, \n    o.ReceiptUrl, \n    o.Total, \n    o.PaymentTransactionId, \n    o.HasBeenShipped,\n(select OrderDetailId, OrderId, ProductId, UnitPrice, Quantity from OrderDetails od where od.OrderId = o.OrderId for json auto) as OrderDetails\nFrom [dbo].[Orders] o FOR JSON PATH)\n)",
+						"queryTimeout": "02:00:00"
 					},
-					"compute": {
-						"coreCount": 8,
-						"computeType": "General"
+					"sink": {
+						"type": "CosmosDbSqlApiSink",
+						"writeBehavior": "insert"
+					},
+					"enableStaging": true,
+					"stagingSettings": {
+						"linkedServiceName": {
+							"referenceName": "linkedService_Storage",
+							"type": "LinkedServiceReference"
+						}
+					},
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"sink": {
+									"path": "$['OrderId']"
+								}
+							},
+							{
+								"sink": {
+									"path": "$['OrderDate']"
+								}
+							},
+							{
+								"sink": {
+									"path": "$['FirstName']"
+								}
+							},
+							{
+								"sink": {
+									"path": "$['LastName']"
+								}
+							},
+							{
+								"sink": {
+									"path": "$['Address']"
+								}
+							},
+							{
+								"sink": {
+									"path": "$['City']"
+								}
+							},
+							{
+								"sink": {
+									"path": "$['State']"
+								}
+							},
+							{
+								"sink": {
+									"path": "$['PostalCode']"
+								}
+							},
+							{
+								"sink": {
+									"path": "$['Country']"
+								}
+							},
+							{
+								"sink": {
+									"path": "$['Phone']"
+								}
+							},
+							{
+								"sink": {
+									"path": "$['SMSOptIn']"
+								}
+							},
+							{
+								"sink": {
+									"path": "$['SMSStatus']"
+								}
+							},
+							{
+								"sink": {
+									"path": "$['Email']"
+								}
+							},
+							{
+								"sink": {
+									"path": "$['ReceiptUrl']"
+								}
+							},
+							{
+								"sink": {
+									"path": "$['Total']"
+								}
+							},
+							{
+								"sink": {
+									"path": "$['PaymentTransactionId']"
+								}
+							},
+							{
+								"sink": {
+									"path": "$['HasBeenShipped']"
+								}
+							},
+							{
+								"sink": {
+									"path": "$['id']"
+								}
+							},
+							{
+								"sink": {
+									"path": "$['_rid']"
+								}
+							},
+							{
+								"sink": {
+									"path": "$['_self']"
+								}
+							},
+							{
+								"sink": {
+									"path": "$['_etag']"
+								}
+							},
+							{
+								"sink": {
+									"path": "$['_attachments']"
+								}
+							},
+							{
+								"sink": {
+									"path": "$['_ts']"
+								}
+							}
+						]
 					}
-				}
+				},
+				"inputs": [
+					{
+						"referenceName": "OrderOrderDetailsJson",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "sinkOrderDetailsCosmos",
+						"type": "DatasetReference"
+					}
+				]
 			}
 		],
 		"annotations": []
