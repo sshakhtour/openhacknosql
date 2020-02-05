@@ -11,7 +11,7 @@
 			"location": {
 				"type": "AzureBlobStorageLocation",
 				"fileName": {
-					"value": "@concat(pipeline().RunId,'json')",
+					"value": "@concat(pipeline().RunId,'.json')",
 					"type": "Expression"
 				},
 				"folderPath": "Orders",
