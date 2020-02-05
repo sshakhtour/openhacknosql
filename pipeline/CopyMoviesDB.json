@@ -1,0 +1,171 @@
+{
+	"name": "CopyMoviesDB",
+	"properties": {
+		"activities": [
+			{
+				"name": "ForEach_dul",
+				"type": "ForEach",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@pipeline().parameters.cw_items",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Copy_dul",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [
+								{
+									"name": "Source",
+									"value": "dbo.@{item().source.table}"
+								},
+								{
+									"name": "Destination",
+									"value": "@{item().destination.collectionName}"
+								}
+							],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource"
+								},
+								"sink": {
+									"type": "CosmosDbSqlApiSink",
+									"writeBehavior": {
+										"value": "@item().copySink.writeBehavior",
+										"type": "Expression"
+									},
+									"disableMetricsCollection": false
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "SourceDataset_dul",
+									"type": "DatasetReference",
+									"parameters": {
+										"cw_table": "@item().source.table"
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DestinationDataset_dul",
+									"type": "DatasetReference",
+									"parameters": {
+										"cw_collectionName": "@item().destination.collectionName"
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"cw_items": {
+				"type": "Array",
+				"defaultValue": [
+					{
+						"source": {
+							"table": "Cartitem"
+						},
+						"destination": {
+							"collectionName": "CartItem"
+						},
+						"copySink": {
+							"writeBehavior": "upsert"
+						}
+					},
+					{
+						"source": {
+							"table": "Category"
+						},
+						"destination": {
+							"collectionName": "Category"
+						},
+						"copySink": {
+							"writeBehavior": "insert"
+						}
+					},
+					{
+						"source": {
+							"table": "Event"
+						},
+						"destination": {
+							"collectionName": "Event"
+						},
+						"copySink": {
+							"writeBehavior": "insert"
+						}
+					},
+					{
+						"source": {
+							"table": "Item"
+						},
+						"destination": {
+							"collectionName": "Item"
+						},
+						"copySink": {
+							"writeBehavior": "insert"
+						}
+					},
+					{
+						"source": {
+							"table": "ItemAggregate"
+						},
+						"destination": {
+							"collectionName": "ItemAggregate"
+						},
+						"copySink": {
+							"writeBehavior": "insert"
+						}
+					},
+					{
+						"source": {
+							"table": "OrderDetails"
+						},
+						"destination": {
+							"collectionName": "OrderDetail"
+						},
+						"copySink": {
+							"writeBehavior": "insert"
+						}
+					},
+					{
+						"source": {
+							"table": "Orders"
+						},
+						"destination": {
+							"collectionName": "Orders"
+						},
+						"copySink": {
+							"writeBehavior": "insert"
+						}
+					},
+					{
+						"source": {
+							"table": "User"
+						},
+						"destination": {
+							"collectionName": "User"
+						},
+						"copySink": {
+							"writeBehavior": "insert"
+						}
+					}
+				]
+			}
+		},
+		"annotations": []
+	}
+}
