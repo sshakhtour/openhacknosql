@@ -1,0 +1,12 @@
+{
+	"name": "OrderOrderDetailsJson",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "linkedservice_MoviesDB",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": []
+	}
+}
