@@ -71,7 +71,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "sourceJsonOrderDetailsBlob",
+						"referenceName": "jsonItemsBlob",
 						"type": "DatasetReference"
 					}
 				]
