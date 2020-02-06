@@ -52,13 +52,14 @@
 						"queryTimeout": "02:00:00"
 					},
 					"sink": {
-						"type": "JsonSink",
+						"type": "DelimitedTextSink",
 						"storeSettings": {
 							"type": "AzureBlobStorageWriteSettings"
 						},
 						"formatSettings": {
-							"type": "JsonWriteSettings",
-							"quoteAllText": true
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
 						}
 					},
 					"enableStaging": false
@@ -71,7 +72,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "jsonItemsBlob",
+						"referenceName": "sinkBlobItems",
 						"type": "DatasetReference"
 					}
 				]
