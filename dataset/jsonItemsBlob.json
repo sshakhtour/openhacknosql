@@ -1,0 +1,19 @@
+{
+	"name": "jsonItemsBlob",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "linkedService_Storage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "@concat(pipeline().RunId,'.json')",
+				"folderPath": "Items",
+				"container": "moviesdb"
+			}
+		}
+	}
+}

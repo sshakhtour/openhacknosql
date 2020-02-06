@@ -52,14 +52,13 @@
 						"queryTimeout": "02:00:00"
 					},
 					"sink": {
-						"type": "DelimitedTextSink",
+						"type": "JsonSink",
 						"storeSettings": {
 							"type": "AzureBlobStorageWriteSettings"
 						},
 						"formatSettings": {
-							"type": "DelimitedTextWriteSettings",
-							"quoteAllText": true,
-							"fileExtension": ".txt"
+							"type": "JsonWriteSettings",
+							"quoteAllText": true
 						}
 					},
 					"enableStaging": false
@@ -72,7 +71,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "sinkBlobItems",
+						"referenceName": "sourceJsonOrderDetailsBlob",
 						"type": "DatasetReference"
 					}
 				]
@@ -98,13 +97,10 @@
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
-						"type": "DelimitedTextSource",
+						"type": "JsonSource",
 						"storeSettings": {
 							"type": "AzureBlobStorageReadSettings",
 							"recursive": true
-						},
-						"formatSettings": {
-							"type": "DelimitedTextReadSettings"
 						}
 					},
 					"sink": {
@@ -115,7 +111,7 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "sinkBlobItems",
+						"referenceName": "jsonItemsBlob",
 						"type": "DatasetReference"
 					}
 				],
