@@ -19,7 +19,7 @@
 						"referenceName": "sourceBlobsToDelete",
 						"type": "DatasetReference"
 					},
-					"enableLogging": true,
+					"enableLogging": false,
 					"storeSettings": {
 						"type": "AzureBlobStorageReadSettings",
 						"recursive": true
@@ -48,7 +48,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "SELECT [value] FROM OPENJSON(\n(Select \n   i.[ItemId]\n      ,i.[VoteCount]\n      ,i.[ProductName]\n      ,i.[ImdbId]\n      ,i.[Description]\n      ,i.[ImagePath]\n      ,i.[ThumbnailPath]\n      ,i.[UnitPrice]\n      ,i.[Popularity]\n      ,i.[OriginalLanguage]\n      ,i.[ReleaseDate]\n      ,i.[VoteAverage]\n\t  ,i.[CategoryId],\n(select\n      [CategoryName]\n       from Category ic where ic.CategoryId = i.CategoryId for json auto) as CategoryName\nFrom [dbo].[Item] i FOR JSON PATH)\n)",
+						"sqlReaderQuery": "SELECT [value] FROM OPENJSON(\n(Select \n   i.[ItemId]\n      ,i.[VoteCount]\n      ,i.[ProductName]\n      ,i.[ImdbId]\n      ,i.[Description]\n      ,i.[ImagePath]\n      ,i.[ThumbnailPath]\n      ,i.[UnitPrice]\n      ,i.[Popularity]\n      ,i.[OriginalLanguage]\n      ,i.[ReleaseDate]\n      ,i.[VoteAverage]\n\t  ,i.[CategoryId]\n\t  , c.[CategoryName]\n\t  \n\nFrom [dbo].[Item] i inner join Category c on i.CategoryId =c.CategoryId FOR JSON PATH)\n)",
 						"queryTimeout": "02:00:00"
 					},
 					"sink": {
