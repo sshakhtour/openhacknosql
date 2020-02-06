@@ -151,6 +151,160 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/ItemsContainer')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "linkedservice_CosmosMoviesDB",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "CosmosDbSqlApiCollection",
+				"schema": {
+					"type": "object",
+					"properties": {
+						"ItemId": {
+							"type": "integer"
+						},
+						"VoteCount": {
+							"type": "integer"
+						},
+						"ProductName": {
+							"type": "string"
+						},
+						"ImdbId": {
+							"type": "integer"
+						},
+						"Description": {
+							"type": "string"
+						},
+						"ImagePath": {
+							"type": "string"
+						},
+						"ThumbnailPath": {
+							"type": "null"
+						},
+						"UnitPrice": {
+							"type": "number"
+						},
+						"CategoryId": {
+							"type": "integer"
+						},
+						"Category": {
+							"type": "null"
+						},
+						"Popularity": {
+							"type": "number"
+						},
+						"OriginalLanguage": {
+							"type": "string"
+						},
+						"ReleaseDate": {
+							"type": "string"
+						},
+						"VoteAverage": {
+							"type": "number"
+						}
+					}
+				},
+				"typeProperties": {
+					"collectionName": "Item"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/linkedservice_CosmosMoviesDB')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ItemsTable')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "linkedservice_MoviesDB",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ItemId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "VoteCount",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ProductName",
+						"type": "varchar"
+					},
+					{
+						"name": "ImdbId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Description",
+						"type": "varchar"
+					},
+					{
+						"name": "ImagePath",
+						"type": "varchar"
+					},
+					{
+						"name": "ThumbnailPath",
+						"type": "varchar"
+					},
+					{
+						"name": "UnitPrice",
+						"type": "decimal",
+						"precision": 18,
+						"scale": 2
+					},
+					{
+						"name": "CategoryId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Category",
+						"type": "varchar"
+					},
+					{
+						"name": "Popularity",
+						"type": "decimal",
+						"precision": 18,
+						"scale": 2
+					},
+					{
+						"name": "OriginalLanguage",
+						"type": "varchar"
+					},
+					{
+						"name": "ReleaseDate",
+						"type": "date"
+					},
+					{
+						"name": "VoteAverage",
+						"type": "decimal",
+						"precision": 18,
+						"scale": 2
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "Item"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/linkedservice_MoviesDB')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/OrderDetailsTable')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -347,6 +501,65 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/jsonItemsBlob')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "linkedService_Storage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "@concat(pipeline().RunId,'.json')",
+							"type": "Expression"
+						},
+						"folderPath": "Items",
+						"container": "moviesdb"
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/linkedService_Storage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/sinkBlobItems')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "linkedService_Storage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "@concat(pipeline().RunId,'.json')",
+							"type": "Expression"
+						},
+						"folderPath": "Items",
+						"container": "moviesdb"
+					},
+					"columnDelimiter": "\t",
+					"escapeChar": "\\",
+					"quoteChar": ""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/linkedService_Storage')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/sinkBlobOrderDetails')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -364,7 +577,7 @@
 							"value": "@concat(pipeline().RunId,'.json')",
 							"type": "Expression"
 						},
-						"folderPath": "Orders",
+						"folderPath": "Items",
 						"container": "moviesdb"
 					},
 					"columnDelimiter": "\t",
@@ -376,6 +589,26 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/linkedService_Storage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/sinkItemsByCategory')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "linkedservice_CosmosMoviesDB",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "CosmosDbSqlApiCollection",
+				"schema": {},
+				"typeProperties": {
+					"collectionName": "ItemByCategory"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/linkedservice_CosmosMoviesDB')]"
 			]
 		},
 		{
@@ -679,249 +912,6 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/SourceDataset_dul')]",
 				"[concat(variables('factoryId'), '/datasets/DestinationDataset_dul')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pipe_CategoryFlow')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "copyCategory",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"queryTimeout": "02:00:00"
-							},
-							"sink": {
-								"type": "CosmosDbSqlApiSink",
-								"writeBehavior": "insert"
-							},
-							"enableStaging": false
-						},
-						"inputs": [
-							{
-								"referenceName": "CategoryTable",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "CategoryCosmos",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/CategoryTable')]",
-				"[concat(variables('factoryId'), '/datasets/CategoryCosmos')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pipe_OrdersFlow')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "copyOrderDetailsSQLtoBlob",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "deleteOldBlobs",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "SELECT [value] FROM OPENJSON(\n(Select \n    o.OrderId, \n    o.OrderDate, \n    o.FirstName, \n    o.LastName, \n    o.[Address], \n    o.City, \n    o.[State], \n    o.PostalCode, \n    o.Country, \n    o.Phone, \n    o.SMSOptIn, \n    o.SMSStatus, \n    o.Email, \n    o.ReceiptUrl, \n    o.Total, \n    o.PaymentTransactionId, \n    o.HasBeenShipped,\n(select OrderDetailId, OrderId, ProductId, UnitPrice, Quantity from OrderDetails od where od.OrderId = o.OrderId for json auto) as OrderDetails\nFrom [dbo].[Orders] o FOR JSON PATH)\n)",
-								"queryTimeout": "02:00:00"
-							},
-							"sink": {
-								"type": "DelimitedTextSink",
-								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
-								},
-								"formatSettings": {
-									"type": "DelimitedTextWriteSettings",
-									"quoteAllText": true,
-									"fileExtension": ".txt"
-								}
-							},
-							"enableStaging": false
-						},
-						"inputs": [
-							{
-								"referenceName": "OrderDetailsTable",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "sinkBlobOrderDetails",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					},
-					{
-						"name": "copyOrderDetailsBlobJsonToCosmos",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "copyOrderDetailsSQLtoBlob",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "JsonSource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true
-								}
-							},
-							"sink": {
-								"type": "CosmosDbSqlApiSink",
-								"writeBehavior": "insert"
-							},
-							"enableStaging": false
-						},
-						"inputs": [
-							{
-								"referenceName": "sourceJsonOrderDetailsBlob",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "OrdersContainer",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					},
-					{
-						"name": "deleteOldBlobs",
-						"type": "Delete",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataset": {
-								"referenceName": "sourceBlobsToDelete",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"enableLogging": false,
-							"storeSettings": {
-								"type": "AzureBlobStorageReadSettings",
-								"recursive": true
-							}
-						}
-					}
-				],
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/OrderDetailsTable')]",
-				"[concat(variables('factoryId'), '/datasets/sinkBlobOrderDetails')]",
-				"[concat(variables('factoryId'), '/datasets/sourceJsonOrderDetailsBlob')]",
-				"[concat(variables('factoryId'), '/datasets/OrdersContainer')]",
-				"[concat(variables('factoryId'), '/datasets/sourceBlobsToDelete')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/sqlToCosmosFlow')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "OrdersTable",
-								"type": "DatasetReference"
-							},
-							"name": "sqlDBOrders",
-							"typeProperties": {}
-						},
-						{
-							"dataset": {
-								"referenceName": "OrderDetailsTable",
-								"type": "DatasetReference"
-							},
-							"name": "sqlDBOrderDetails",
-							"typeProperties": {}
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "OrdersContainer",
-								"type": "DatasetReference"
-							},
-							"name": "sinkCosmosOrders"
-						}
-					],
-					"transformations": [
-						{
-							"name": "joinOrderOrderDetails"
-						}
-					],
-					"script": "source(output(\n\t\tOrderId as integer,\n\t\tOrderDate as timestamp,\n\t\tFirstName as string,\n\t\tLastName as string,\n\t\tAddress as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tPostalCode as string,\n\t\tCountry as string,\n\t\tPhone as string,\n\t\tSMSOptIn as boolean,\n\t\tSMSStatus as string,\n\t\tEmail as string,\n\t\tReceiptUrl as string,\n\t\tTotal as decimal(18,2),\n\t\tPaymentTransactionId as string,\n\t\tHasBeenShipped as boolean\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> sqlDBOrders\nsource(output(\n\t\tOrderDetailId as integer,\n\t\tOrderId as integer,\n\t\tEmail as string,\n\t\tProductId as integer,\n\t\tQuantity as integer,\n\t\tUnitPrice as decimal(18,2)\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> sqlDBOrderDetails\nsqlDBOrders, sqlDBOrderDetails join(sqlDBOrders@OrderId == sqlDBOrderDetails@OrderId,\n\tjoinType:'inner',\n\tbroadcast: 'none')~> joinOrderOrderDetails\njoinOrderOrderDetails sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'document',\n\tpartitionKey: ['/OrderId'],\n\tthroughput: 400,\n\tmapColumn(\n\t\tOrderId = sqlDBOrders@OrderId,\n\t\tOrderDate,\n\t\tFirstName,\n\t\tLastName,\n\t\tAddress,\n\t\tCity,\n\t\tState,\n\t\tPostalCode,\n\t\tCountry,\n\t\tPhone,\n\t\tSMSOptIn,\n\t\tSMSStatus,\n\t\tEmail = sqlDBOrders@Email,\n\t\tReceiptUrl,\n\t\tTotal,\n\t\tPaymentTransactionId,\n\t\tHasBeenShipped,\n\t\tOrderDetailId,\n\t\tProductId,\n\t\tQuantity,\n\t\tUnitPrice\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sinkCosmosOrders"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/OrdersTable')]",
-				"[concat(variables('factoryId'), '/datasets/OrderDetailsTable')]",
-				"[concat(variables('factoryId'), '/datasets/OrdersContainer')]"
 			]
 		}
 	]
