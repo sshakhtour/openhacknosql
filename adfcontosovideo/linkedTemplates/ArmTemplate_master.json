@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "adfcontosovideo"
 		},
+		"linkedService_Storage_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'linkedService_Storage'"
+		},
 		"linkedservice_CosmosMoviesDB_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'linkedservice_CosmosMoviesDB'"
@@ -14,10 +18,6 @@
 		"linkedservice_MoviesDB_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'linkedservice_MoviesDB'"
-		},
-		"linkedService_Storage_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'linkedService_Storage'"
 		},
 		"containerUri": {
 			"type": "string",
@@ -46,14 +46,14 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
+					"linkedService_Storage_connectionString": {
+						"value": "[parameters('linkedService_Storage_connectionString')]"
+					},
 					"linkedservice_CosmosMoviesDB_connectionString": {
 						"value": "[parameters('linkedservice_CosmosMoviesDB_connectionString')]"
 					},
 					"linkedservice_MoviesDB_connectionString": {
 						"value": "[parameters('linkedservice_MoviesDB_connectionString')]"
-					},
-					"linkedService_Storage_connectionString": {
-						"value": "[parameters('linkedService_Storage_connectionString')]"
 					}
 				}
 			},

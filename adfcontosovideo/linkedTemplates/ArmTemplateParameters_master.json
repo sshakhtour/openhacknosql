@@ -5,13 +5,13 @@
 		"factoryName": {
 			"value": "adfcontosovideo"
 		},
+		"linkedService_Storage_connectionString": {
+			"value": ""
+		},
 		"linkedservice_CosmosMoviesDB_connectionString": {
 			"value": ""
 		},
 		"linkedservice_MoviesDB_connectionString": {
-			"value": ""
-		},
-		"linkedService_Storage_connectionString": {
 			"value": ""
 		},
 		"containerUri": {
