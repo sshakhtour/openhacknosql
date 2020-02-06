@@ -1,0 +1,23 @@
+{
+	"name": "sinkBlobItems",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "linkedService_Storage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "@concat(pipeline().RunId,'.json')",
+				"folderPath": "Items",
+				"container": "moviesdb"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
