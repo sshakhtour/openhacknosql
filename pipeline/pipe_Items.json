@@ -46,6 +46,33 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT [value] FROM OPENJSON(\n(Select \n   i.[ItemId]\n      ,i.[VoteCount]\n      ,i.[ProductName]\n      ,i.[ImdbId]\n      ,i.[Description]\n      ,i.[ImagePath]\n      ,i.[ThumbnailPath]\n      ,i.[UnitPrice]\n      ,i.[Popularity]\n      ,i.[OriginalLanguage]\n      ,i.[ReleaseDate]\n      ,i.[VoteAverage]\n\t  ,i.[CategoryId],\n(select\n      [CategoryName]\n       from Category ic where ic.CategoryId = i.CategoryId for json auto) as CategoryName\nFrom [dbo].[Item] i FOR JSON PATH)\n)",
+						"queryTimeout": "02:00:00"
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "ItemsTable",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "copyItemsBlobJsonToCosmos",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
 					"enableStaging": false
 				}
 			}
