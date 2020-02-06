@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataset": {
-						"referenceName": "sourceBlobsToDelete",
+						"referenceName": "sinkBlobItems",
 						"type": "DatasetReference"
 					},
 					"enableLogging": false,
