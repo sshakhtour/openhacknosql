@@ -51,6 +51,17 @@
 						"sqlReaderQuery": "SELECT [value] FROM OPENJSON(\n(Select \n   i.[ItemId]\n      ,i.[VoteCount]\n      ,i.[ProductName]\n      ,i.[ImdbId]\n      ,i.[Description]\n      ,i.[ImagePath]\n      ,i.[ThumbnailPath]\n      ,i.[UnitPrice]\n      ,i.[Popularity]\n      ,i.[OriginalLanguage]\n      ,i.[ReleaseDate]\n      ,i.[VoteAverage]\n\t  ,i.[CategoryId],\n(select\n      [CategoryName]\n       from Category ic where ic.CategoryId = i.CategoryId for json auto) as CategoryName\nFrom [dbo].[Item] i FOR JSON PATH)\n)",
 						"queryTimeout": "02:00:00"
 					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobStorageWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
 					"enableStaging": false
 				},
 				"inputs": [
@@ -58,12 +69,25 @@
 						"referenceName": "ItemsTable",
 						"type": "DatasetReference"
 					}
+				],
+				"outputs": [
+					{
+						"referenceName": "sinkBlobItems",
+						"type": "DatasetReference"
+					}
 				]
 			},
 			{
 				"name": "copyItemsBlobJsonToCosmos",
 				"type": "Copy",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "copyItemSQLtoBlob",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "7.00:00:00",
 					"retry": 0,
@@ -73,8 +97,34 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "CosmosDbSqlApiSink",
+						"writeBehavior": "insert"
+					},
 					"enableStaging": false
-				}
+				},
+				"inputs": [
+					{
+						"referenceName": "sinkBlobItems",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ItemsContainer",
+						"type": "DatasetReference"
+					}
+				]
 			}
 		],
 		"annotations": []
