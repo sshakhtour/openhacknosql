@@ -19,7 +19,7 @@
 			},
 			"columnDelimiter": "\t",
 			"escapeChar": "\\",
-			"quoteChar": "\""
+			"quoteChar": ""
 		},
 		"schema": []
 	}
