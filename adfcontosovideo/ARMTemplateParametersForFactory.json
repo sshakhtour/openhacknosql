@@ -10,6 +10,9 @@
 		},
 		"linkedservice_MoviesDB_connectionString": {
 			"value": ""
+		},
+		"linkedService_Storage_connectionString": {
+			"value": ""
 		}
 	}
 }
