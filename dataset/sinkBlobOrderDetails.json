@@ -14,7 +14,7 @@
 					"value": "@concat(pipeline().RunId,'.json')",
 					"type": "Expression"
 				},
-				"folderPath": "Items",
+				"folderPath": "Orders",
 				"container": "moviesdb"
 			},
 			"columnDelimiter": "\t",
